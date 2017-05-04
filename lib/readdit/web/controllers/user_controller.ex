@@ -9,11 +9,18 @@ defmodule Readdit.Web.UserController do
   end
 
   def new(conn, _params) do
-    changeset = Accounts.change_user()
+    changeset = Accounts.change_user(%Readdit.Accounts.User{})
     render conn, "new.html", changeset: changeset
   end
 
   def create(conn, %{"user" => user_params}) do
-    # here will be an implementation
+    case Accounts.create_user(user_params) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:info, "User created successfully.")
+        |> redirect(to: user_path(conn, :show, user))
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "new.html", changeset: changeset)
+    end
   end
 end

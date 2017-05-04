@@ -104,8 +104,18 @@ defmodule Readdit.Accounts do
 
   defp user_changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:username, :password_hash, :is_admin])
-    |> validate_required([:username, :password_hash, :is_admin])
+    |> cast(attrs, [:username, :password, :password_confirmation, :is_admin])
+    |> validate_required([:username, :password, :password_confirmation])
+    |> validate_confirmation(:password)
+    |> hash_password
     |> unique_constraint(:username)
+  end
+
+  defp hash_password(changeset) do
+    case changeset do
+      %Ecto.Changeset{valid?: true, changes: %{password: password}} ->
+          put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(password))
+      _ -> changeset
+    end
   end
 end
