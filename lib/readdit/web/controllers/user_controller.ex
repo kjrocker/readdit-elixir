@@ -9,7 +9,7 @@ defmodule Readdit.Web.UserController do
   end
 
   def new(conn, _params) do
-    changeset = Accounts.change_user(%{})
+    changeset = Accounts.change_user()
     render conn, "new.html", changeset: changeset
   end
 
